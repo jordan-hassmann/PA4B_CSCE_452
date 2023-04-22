@@ -1,11 +1,9 @@
 from launch import LaunchDescription
 from launch_ros.actions import Node
-from launch.actions import DeclareLaunchArgument, ExecuteProcess, RegisterEventHandler, EmitEvent
-from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
-from launch.event_handlers import OnProcessExit
-from launch.events import Shutdown
+from launch.actions import DeclareLaunchArgument
+from launch.substitutions import LaunchConfiguration
 
-from project4a_v2.load_robot import load_disc_robot
+from project4b.load_robot import load_disc_robot
 
 
 
@@ -38,18 +36,35 @@ def generate_launch_description():   # This function needs this exact name
     )
 
     jimmy_node = Node(
-        package='project4a_v2',
+        package='project4b',
         executable='jimmy', 
         parameters=[
             { 'robot': robot_arg, 'world': world_arg }
         ]
     )
 
+
+    navigation_node = Node(
+        package='project4b', 
+        executable='navigation',
+        output='screen' 
+    )
+
+    translator_node = Node(
+        package='project4b', 
+        executable='translator',
+        output='screen' 
+    )
+
+
+
     ld = LaunchDescription([
         robot_descriptor, 
         world_descriptor,
         jimmy_node,
         robot_state_publisher_node,
+        navigation_node,
+        translator_node, 
     ])
 
     return ld
