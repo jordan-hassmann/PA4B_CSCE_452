@@ -7,18 +7,18 @@ from project4b.load_robot import load_disc_robot
 from math import sin, cos, atan2, pi
 
 
-angle_min, angle_max = -1.8, 1.8
-angle_inc = (angle_max - angle_min) / 25
 V_MAX, W_MAX = 2, 2
-publisher = None 
-
 
 
 def get_direction(ranges): 
+    ANGLE_MIN = robot['laser']['angle_min']
+    ANGLE_MAX = robot['laser']['angle_max']
+    ANGLE_INC = (ANGLE_MAX - ANGLE_MIN) / robot['laser']['count']
 
+    # Get the weighted sums for each range in cartesian form, and return direction of resulting vector
     weighted_x = weighted_y = 0 
 
-    for r, θ in zip(ranges, range(angle_min, angle_inc, angle_max+angle_inc)): 
+    for r, θ in zip(ranges, range(ANGLE_MIN, ANGLE_INC, ANGLE_MAX+ANGLE_INC)): 
         x, y = r*cos(θ), r*sin(θ)
         weighted_x += r*x 
         weighted_y += r*y
@@ -42,12 +42,24 @@ def controller(data):
     
 
 def main(args=None):
+    global publisher 
+    global robot
+
+
     rclpy.init(args=args)
 
+    # Node creation
     node = rclpy.create_node('navigation_controller')
+
+    # Getting the name of which robot to be used and loading it
+    node.declare_parameter('robot', 'normal.robot.txt')
+    robot = load_disc_robot(node.get_parameter('robot').value)
+
+    # Create the publisher and subscriptions
     publisher = node.create_publisher(Twist, '/cmd_vel', 10)
     node.create_subscription(LaserScan, '/scan', controller, 10)
 
+    # Complete the node
     rclpy.spin(node)
     rclpy.shutdown()
     

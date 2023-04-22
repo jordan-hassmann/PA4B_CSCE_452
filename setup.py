@@ -14,7 +14,6 @@ setup(
         ('share/ament_index/resource_index/packages', ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
         (os.path.join('share', package_name, 'launch/'), glob('launch/*launch.[pxy][yma]*')),
-        (os.path.join('share', package_name, 'worlds/'), glob('worlds/*')),
         (os.path.join('share', package_name, 'robots/'), glob('robots/*'))
     ],
 
@@ -27,7 +26,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            "jimmy = project4b.jimmy_node:main",
+            "navigation = project4b.navigation_node:main",
+            "translator = project4b.translator_node:main",
         ],
     },
 
