@@ -3,7 +3,7 @@
 import rclpy
 from sensor_msgs.msg import LaserScan
 from geometry_msgs.msg import Twist
-from project4a_v2.load_robot import load_disc_robot
+from project4b.load_robot import load_disc_robot
 from math import sin, cos, atan2, pi
 
 

@@ -1,6 +1,6 @@
 
 from math import cos, sin
-from project4a.Helpers import euclid, intersection
+from project4b.Helpers import euclid, intersection
 from random import random, gauss
 
 
