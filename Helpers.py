@@ -1,6 +1,5 @@
-
-from math import sqrt, cos, sin
 import math
+from math import sqrt, cos, sin
 from numpy import empty
 
 

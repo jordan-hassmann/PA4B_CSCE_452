@@ -1,6 +1,4 @@
-
 import yaml 
-
 
 def load_world(file_name):
     with open(file_name) as f:
