@@ -4,36 +4,50 @@ import rclpy
 from sensor_msgs.msg import LaserScan
 from geometry_msgs.msg import Twist
 from project4b.load_robot import load_disc_robot
-from math import sin, cos, atan2, pi
+from math import sin, cos, atan2, pi, isnan, isinf
 
 
-V_MAX, W_MAX = 2, 2
-
+V_MAX, W_MAX = 0.1, 2.5
 
 def get_direction(ranges): 
     ANGLE_MIN = robot['laser']['angle_min']
     ANGLE_MAX = robot['laser']['angle_max']
     ANGLE_INC = (ANGLE_MAX - ANGLE_MIN) / robot['laser']['count']
 
-    # Get the weighted sums for each range in cartesian form, and return direction of resulting vector
-    weighted_x = weighted_y = 0 
+    x = y = 0
+    n = 0
 
-    for r, θ in zip(ranges, range(ANGLE_MIN, ANGLE_INC, ANGLE_MAX+ANGLE_INC)): 
-        x, y = r*cos(θ), r*sin(θ)
-        weighted_x += r*x 
-        weighted_y += r*y
+    for i, r in enumerate(ranges): 
+        if isnan(r) or isinf(r): continue
 
-    return atan2(weighted_y, weighted_x)
+        θ = ANGLE_MIN + i * ANGLE_INC
+        x += r*cos(θ)
+        y += r*sin(θ)
+        n += 1
 
-def get_velocities(θ): 
-    v = V_MAX * (pi - abs(θ)) / pi
+    x /= n 
+    y /= n 
+
+    return x, y
+
+
+def get_velocities(x, y): 
+
+    θ = atan2(y, x)
+    v = 7 * V_MAX * (pi/7 - abs(θ)) / pi
     w = W_MAX * θ / pi
+
+    if v < 0 or x < 0.3: 
+        v = 0.0
+        w = 1.0
+    
     return v, w
     
 def controller(data): 
-    θ = get_direction(data.ranges)
-    v, w = get_velocities(θ)
-    
+
+    x, y = get_direction(data.ranges)
+    v, w = get_velocities(x, y)
+
     t = Twist() 
     t.linear.x = v 
     t.angular.z = w
@@ -44,6 +58,7 @@ def controller(data):
 def main(args=None):
     global publisher 
     global robot
+    global node
 
 
     rclpy.init(args=args)

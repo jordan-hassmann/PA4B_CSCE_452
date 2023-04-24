@@ -24,12 +24,13 @@ def main(args=None):
     global vl_publisher
     global vr_publisher
     global robot
+    global node
     
 
     rclpy.init(args=args)
 
     # Node creation
-    node = rclpy.create_node('navigation_controller')
+    node = rclpy.create_node('translation_controller')
 
     # Getting the name of which robot to be used and loading it
     node.declare_parameter('robot', 'normal.robot.txt')
